@@ -1,3 +1,12 @@
+---
+name: issue_template
+about: issue模板
+title: ''
+labels: ''
+assignees: ziawerquart
+
+---
+
 <!--
 通用 Issue 模板
 适用范围：
