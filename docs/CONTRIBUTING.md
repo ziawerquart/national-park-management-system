@@ -7,7 +7,7 @@
 
 为保证 **国家公园管理系统数据库课程设计** 项目在开发、设计与文档编写过程中的一致性、可维护性与可追溯性，特制定本协作规范文档。
 
-本规范适用于本仓库内 **所有成员**，包括但不CONTRIBUTING.md限于：
+本规范适用于本仓库内 **所有成员**，包括但不限于：
 
 - SQL 设计与实现
     
@@ -64,78 +64,99 @@ fix bug
 ## 3. 分支使用规范（极简版）
 
 ### 3.1 总原则（所有成员必须遵守）
-- main 分支：稳定版本，只合并成果（不直接开发，不 force push）
-- 一件事一个分支：一个分支只做一个目标（例如：一张图 / 一组DDL / 一组SQL / 一个功能）
+- main 分支：稳定版本，只合并阶段性成果（不直接开发，不 force push）
+- 一件事一个分支：一个分支只对应一个明确目标（一个阶段 / 一组成果）
 - 分支名全部使用英文小写 + 连字符（kebab-case），禁止中文、空格、下划线
+- **所有业务分支必须带 stage 后缀（stage1 / stage2 / stage3）**
 
 ---
 
-### 3.2 分支命名统一格式（推荐）
-< type>/< scope>-< short-desc>
+### 3.2 分支命名统一格式（强烈推荐）
 
-- type：变更类型（下面给出固定取值）
-- scope：业务线/模块范围（建议使用业务前缀）
-- short-desc：本次工作内容的简短描述（2-5 个单词）
+< type > / < scope > - < stage >
 
----
 
-### 3.3 type 取值（固定选项）
-- docs        文档/图（用例图、鲁棒图、UML、报告、规范）
-- sql         SQL 相关（DDL / queries / views / triggers / procedures）
-- feat        Python 代码/功能新增（src/main）
-- test        测试代码/测试数据（src/test 或测试数据脚本）
-- chore       工程杂项（目录调整、CI、模板、配置、格式化等）
-- fix         修复（SQL 或代码的错误修复）
+- type：变更类型（固定取值，见 3.3）
+- scope：业务线 / 模块范围（见 3.4）
+- stage：课程设计阶段（必须填写）
+
+> 说明：  
+> 为避免过度复杂化，**不再强制要求 short-desc**，阶段编号即代表本次工作的范围。
 
 ---
 
-### 3.4 scope 取值（与业务线前缀一致）
-- biodiversity
-- environment
-- visitor
-- law-enforcement
-- research
-- global（跨业务线/全局规则/公共脚本）
+### 3.3 stage 取值（必须遵守）
+- stage1：需求分析 + 用例图 / 鲁棒图 / UML 类图 / 数据字典
+- stage2：逻辑结构 + 物理结构设计（表结构 / DDL）
+- stage3：SQL 查询、视图、触发器、存储过程、持久层代码与测试
+
+> 原则：  
+> - **一个 stage = 一个 PR**
+> - 同一业务线，同一 stage 只保留一个活跃分支
 
 ---
 
-### 3.5 示例（✅ 推荐照抄）
-#### 文档 / 图
-- docs/biodiversity-use-case
-- docs/biodiversity-robustness
-- docs/global-contributing-update
+### 3.4 type 取值（固定选项）
+- docs   文档 / 图（用例图、鲁棒图、UML、报告、规范）
+- sql    SQL 相关（DDL / queries / views / triggers / procedures）
+- feat   Python 功能 / 持久层代码
+- test   测试代码 / 测试数据
+- fix    修复已合并内容的问题
+- chore  工程杂项（目录调整、模板、配置等）
 
-#### SQL（DDL / 查询 / 视图 / 触发器 / 存储过程）
-- sql/biodiversity-ddl-species-habitat
-- sql/visitor-queries-flow-statistics
-- sql/environment-views-threshold-warning
-- sql/law-enforcement-triggers-dispatch
-- sql/research-procedures-permission-control
+---
 
-#### Python 功能 / 持久层
-- feat/biodiversity-dao-crud
-- feat/visitor-service-reservation
+### 3.5 scope 取值（与业务线前缀一致）
+- biodiversity        生物多样性监测
+- environment         生态环境监测
+- visitor             游客智能管理
+- law-enforcement     执法监管
+- research            科研数据支撑
+- global              跨业务线 / 全局内容
 
-#### 修复
-- fix/sql-foreign-key-error
-- fix/visitor-query-time-filter
+---
+
+### 3.6 示例（✅ 推荐照抄）
+#### Stage 1（需求分析 & UML）
+- docs/biodiversity-stage1
+- docs/environment-stage1
+- docs/law-enforcement-stage1
+- docs/research-stage1
+
+#### Stage 2（表结构 & DDL）
+- sql/biodiversity-stage2
+- sql/visitor-stage2
+- sql/environment-stage2
+
+#### Stage 3（SQL / 代码 / 测试）
+- sql/biodiversity-stage3
+- feat/visitor-stage3
+- test/environment-stage3
+
+#### 修复（针对已合并阶段）
+- fix/biodiversity-stage1
+- fix/sql-stage2
 
 #### 工程杂项
-- chore/global-restructure-folders
-- chore/global-update-issue-templates
+- chore/global-stage1
+- chore/global-stage3
 
 ---
 
-### 3.6 禁止分支名（❌）
+### 3.7 禁止分支名（❌）
 - test / tmp / new / aaa
-- ziawerquart/xxx（不要用个人名做前缀）
-- feature_xxx（不要下划线）
-        
-### 3.7 何时必须创建分支（重要）
+- ziawerquart/xxx（不要使用个人名）
+- feature_xxx（禁止下划线）
+- docs/biodiversity-uml-final-final（禁止语义不清）
+- docs/biodiversity（缺少 stage 后缀）
+
+---
+
+## 何时必须创建分支（重要）
 
 为避免协作混乱、降低返工成本，项目约定在以下情况 **必须创建新分支，并通过 Pull Request 合并到 main 分支**：
 
-#### 必须开分支的情况
+### 必须开分支的情况
 - **修改项目规则或协作规范**  
   例如：`CONTRIBUTING.md`、命名规范、协作流程说明等。
 - **调整项目目录结构**  
@@ -147,7 +168,7 @@ fix bug
 - **一次性改动内容较多**  
   单次工作涉及多个文件或多个模块，影响范围不清晰时。
 
-#### 可以直接提交到 main 的情况
+### 可以直接提交到 main 的情况
 - 新增会议记录、进度记录等过程性文档。
 - 补充已经约定好的设计图、截图、说明性材料，且不涉及规则变更。
 - 小幅度文字修正（如错别字、格式微调）。
@@ -156,7 +177,6 @@ fix bug
 > **改规则 / 改结构 / 改数据库 / 改公共内容 → 必须开分支 + PR**  
 > **只加材料 / 会议记录 / 小改文案 → 可直接提交 main**
 
----
 
 ## 4. 文件与目录命名规范
 
@@ -478,3 +498,6 @@ docs/data_dictionary/research_data_dictionary.xlsx
 >     
 
 ---
+
+
+
