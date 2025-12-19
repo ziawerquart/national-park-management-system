@@ -1,0 +1,62 @@
+@startuml
+title 执法监管业务线 UML 类图
+
+'==============================
+' 执法人员
+'==============================
+class LawEnforcementOfficer {
+  +lawId : String
+  +name : String
+  +department : String
+  +authority : String
+  +contact : String
+  +deviceId : String
+}
+
+'==============================
+' 视频监控点
+'==============================
+class VideoMonitorPoint {
+  +monitorId : String
+  +regionId : String
+  +latitude : Decimal
+  +longitude : Decimal
+  +monitorRange : String
+  +deviceStatus : String
+  +storageCycle : Integer
+}
+
+'==============================
+' 非法行为记录
+'==============================
+class IllegalBehaviorRecord {
+  +recordId : String
+  +behaviorType : String
+  +occurTime : DateTime
+  +regionId : String
+  +evidencePath : String
+  +processStatus : String
+  +processResult : String
+  +punishmentBasis : String
+}
+
+'==============================
+' 执法调度信息
+'==============================
+class LawEnforcementDispatch {
+  +dispatchId : String
+  +dispatchTime : DateTime
+  +responseTime : DateTime
+  +finishTime : DateTime
+  +dispatchStatus : String
+}
+
+'==============================
+' 类之间的关系
+'==============================
+
+VideoMonitorPoint "1" -- "0..*" IllegalBehaviorRecord : provides evidence
+IllegalBehaviorRecord "1" -- "1..*" LawEnforcementDispatch : generates
+LawEnforcementOfficer "1" -- "0..*" LawEnforcementDispatch : handles
+LawEnforcementOfficer "1" -- "0..*" IllegalBehaviorRecord : processes
+@enduml
