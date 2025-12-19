@@ -1,0 +1,121 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' =========================
+' Core Domain Classes (from group UML)
+' =========================
+
+class Species {
+  species_id : String
+  scientific_name : String
+  common_name : String
+  protection_level : String
+}
+
+class Habitat {
+  habitat_id : String
+  habitat_name : String
+  region_code : String
+}
+
+class MonitoringRecord {
+  record_id : String
+  monitor_time : DateTime
+  data_type : String
+  data_value : String
+}
+
+class User {
+  user_id : String
+  name : String
+  role : String
+}
+
+class HabitatPrimarySpecies {
+  id : String
+}
+
+' =========================
+' Research Business Classes
+' =========================
+
+class ResearchProject {
+  project_id : String
+  project_name : String
+  principal_investigator_id : String
+  applicant_organization : String
+  start_time : Date
+  end_time : Date
+  project_status : ProjectStatus
+  research_field : String
+}
+
+class ResearchDataCollection {
+  collection_id : String
+  collection_time : DateTime
+  collector_id : String
+  area_id : String
+  collection_content : String
+  data_source : DataSource
+}
+
+class ResearchResult {
+  result_id : String
+  result_type : ResultType
+  result_name : String
+  publish_time : Date
+  access_level : AccessLevel
+  file_path : String
+}
+
+' =========================
+' Enumerations
+' =========================
+
+enum ProjectStatus {
+  InProgress
+  Completed
+  Suspended
+}
+
+enum DataSource {
+  FieldCollection
+  SystemReference
+}
+
+enum ResultType {
+  Paper
+  Report
+  Patent
+  Other
+}
+
+enum AccessLevel {
+  Public
+  Internal
+  Confidential
+}
+
+' =========================
+' Associations
+' =========================
+
+' --- Ecology Core Relations ---
+Habitat "1" -- "0..*" MonitoringRecord : contains
+Species "1" -- "0..*" MonitoringRecord : observed_in
+Habitat "1" -- "0..*" HabitatPrimarySpecies
+Species "1" -- "0..*" HabitatPrimarySpecies
+
+User "1" -- "0..*" MonitoringRecord : records
+
+' --- Research Business Relations ---
+ResearchProject "1" o-- "0..*" ResearchDataCollection : has
+ResearchProject "1" o-- "0..*" ResearchResult : produces
+
+User "1" -- "0..*" ResearchProject : leads
+User "1" -- "0..*" ResearchDataCollection : collects
+
+' --- Data Reuse Relation ---
+ResearchDataCollection "0..*" ..> "0..*" MonitoringRecord : references
+
+@enduml
