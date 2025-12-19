@@ -1,0 +1,80 @@
+@startuml
+title 生态环境监测业务线 UML 类图
+
+'==============================
+' 监测指标
+'==============================
+class MonitoringIndicator {
+  +indicatorId : String
+  +indicatorName : String
+  +unit : String
+  +upperLimit : Decimal
+  +lowerLimit : Decimal
+  +monitorFrequency : String
+}
+
+'==============================
+' 区域 / 功能分区
+'==============================
+class Region {
+  +regionId : String
+  +regionName : String
+  +regionType : String
+}
+
+'==============================
+' 监测设备
+'==============================
+class MonitoringDevice {
+  +deviceId : String
+  +deviceType : String
+  +installTime : DateTime
+  +calibrationCycle : Integer
+  +runStatus : String
+  +communicationProtocol : String
+}
+
+'==============================
+' 环境监测数据
+'==============================
+class EnvironmentalData {
+  +dataId : String
+  +collectTime : DateTime
+  +monitorValue : Decimal
+  +dataQuality : String
+  +isAbnormal : Boolean
+}
+
+'==============================
+' 设备校准记录
+'==============================
+class CalibrationRecord {
+  +recordId : String
+  +calibrationTime : DateTime
+  +technician : String
+  +remark : String
+}
+
+'==============================
+' 异常预警
+'==============================
+class Alert {
+  +alertId : String
+  +alertTime : DateTime
+  +alertLevel : String
+  +alertStatus : String
+}
+
+'==============================
+' 类之间的关系
+'==============================
+
+MonitoringIndicator "1" -- "0..*" EnvironmentalData : monitors
+MonitoringDevice "1" -- "0..*" EnvironmentalData : collects
+Region "1" -- "0..*" MonitoringDevice : deployed
+Region "1" -- "0..*" EnvironmentalData : belong
+
+MonitoringDevice "1" -- "0..*" CalibrationRecord : calibrate
+EnvironmentalData "1" -- "0..1" Alert : triggers
+
+@enduml
