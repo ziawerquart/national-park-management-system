@@ -1,18 +1,10 @@
 ---
 name: discussion_issue_template
-about: 用于讨论问题，提出bug
+about: 表结构讨论、设计确认或实现中遇到的问题
 title: 问题：一句话说明
 labels: discussion
 assignees: ''
 
----
-
----
-name: 讨论 / 问题（Discussion）
-about: 表结构讨论、设计确认或实现中遇到的问题
-title: "问题：一句话说明"
-labels: discussion
-assignees: ""
 ---
 
 ## 使用说明（必看）
