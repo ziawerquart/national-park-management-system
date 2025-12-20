@@ -1,18 +1,10 @@
 ---
 name: task_issue_template
-about: 用于安排任务
+about: 安排具体任务，定义完成标准和截止时间
 title: "[Stage] 任务简述（负责人）"
 labels: task
 assignees: ''
 
----
-
----
-name: 任务（Task）
-about: 安排具体任务，定义完成标准和截止时间
-title: "[Stage] 任务简述（负责人）"
-labels: task
-assignees: ""
 ---
 
 ## 使用说明（必看）
