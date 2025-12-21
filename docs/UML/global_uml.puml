@@ -1,0 +1,472 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+left to right direction
+
+' =========================
+' Enums (Global)`
+' =========================
+enum UserRole {
+  ecological_monitor
+  data_analyst
+  technician
+  law_enforcement_officer
+  researcher
+  admin
+  park_manager
+}
+
+enum RecordStatus {
+  pending
+  rechecked
+  valid
+}
+
+enum MonitoringMethod {
+  camera
+  manual
+  drone
+}
+
+enum ProtectionLevel {
+  first_class
+  second_class
+  none
+}
+
+enum EntryMethod {
+  online_reservation
+  on_site_ticket
+}
+
+enum ReservationStatus {
+  confirmed
+  cancelled
+  completed
+}
+
+enum PaymentStatus {
+  paid
+  unpaid
+}
+
+enum FlowStatus {
+  normal
+  warning
+  restricted
+}
+
+enum DataQuality {
+  excellent
+  good
+  fair
+  poor
+}
+
+enum DeviceRunStatus {
+  normal
+  fault
+  offline
+}
+
+enum AlertStatus {
+  open
+  acknowledged
+  closed
+}
+
+enum ProcessStatus {
+  unprocessed
+  processing
+  closed
+}
+
+enum DispatchStatus {
+  pending
+  assigned
+  finished
+}
+
+enum ProjectStatus {
+  ongoing
+  completed
+  suspended
+}
+
+enum DataSource {
+  field_collection
+  system_call
+}
+
+enum AchievementType {
+  paper
+  report
+  patent
+  other
+}
+
+enum SharePermission {
+  public
+  internal
+  confidential
+}
+
+' =========================================================
+' Shared / Global (补齐你关系里用到的 Shared.*)
+' =========================================================
+package "Shared / Global" as Shared {
+  class Region {
+    +region_id: String <<PK>>
+    +region_name: String
+    +region_type: String
+  }
+
+  class User {
+    +user_id: String <<PK>>
+    +user_name: String
+    +role: UserRole
+  }
+
+  class MonitoringDevice {
+    +device_id: String <<PK>>
+    +device_type: String
+    +install_time: DateTime
+    +calibration_cycle: Integer
+    +run_status: DeviceRunStatus
+    +communication_protocol: String
+    +region_id: String <<FK>>
+  }
+}
+
+' =========================================================
+' Biodiversity Monitoring
+' =========================================================
+package "Biodiversity Monitoring" as Bio {
+  class Species {
+    +species_id: String <<PK>>
+    +species_name_cn: String
+    +species_name_latin: String
+    +kingdom: String
+    +phylum: String
+    +tax_class: String
+    +tax_order: String
+    +family: String
+    +genus: String
+    +species: String
+    +protection_level: ProtectionLevel
+    +living_habits: Text
+    +distribution_description: Text
+    +habitat_id: String <<FK>>
+  }
+
+  class Habitat {
+    +habitat_id: String <<PK>>
+    +area_name: String
+    +ecological_type: String
+    +area_size: Decimal
+    +core_protection_area: Text
+    +environment_suitability_score: Decimal
+    +region_id: String <<FK>>
+  }
+
+  class HabitatPrimarySpecies {
+    +habitat_id: String <<PK, FK>>
+    +species_id: String <<PK, FK>>
+    +is_primary: Boolean
+  }
+
+  class MonitoringRecord {
+    +record_id: String <<PK>>
+    +species_id: String <<FK>>
+    +device_id: String <<FK>>
+    +monitoring_time: DateTime
+    +longitude: Decimal
+    +latitude: Decimal
+    +monitoring_method: MonitoringMethod
+    +image_path: String
+    +count_number: Integer
+    +behavior_description: Text
+    +recorder_id: String <<FK>>
+    +status: RecordStatus
+  }
+}
+
+' =========================================================
+' Environmental Monitoring
+' =========================================================
+package "Environmental Monitoring" as Env {
+  class MonitoringIndicator {
+    +indicator_id: String <<PK>>
+    +indicator_name: String
+    +unit: String
+    +upper_limit: Decimal
+    +lower_limit: Decimal
+    +monitor_frequency: String
+  }
+
+  class EnvironmentalData {
+    +data_id: String <<PK>>
+    +indicator_id: String <<FK>>
+    +device_id: String <<FK>>
+    +region_id: String <<FK>>
+    +collect_time: DateTime
+    +monitor_value: Decimal
+    +data_quality: DataQuality
+    +is_abnormal: Boolean
+  }
+
+  class CalibrationRecord {
+    +record_id: String <<PK>>
+    +device_id: String <<FK>>
+    +calibration_time: DateTime
+    +technician_id: String <<FK>>
+    +remark: String
+  }
+
+  class Alert {
+    +alert_id: String <<PK>>
+    +data_id: String <<FK>>
+    +alert_time: DateTime
+    +alert_level: String
+    +alert_status: AlertStatus
+  }
+}
+
+' =========================================================
+' Visitor Management
+' =========================================================
+package "Visitor Management" as Vis {
+  class Visitor {
+    +visitor_id: String <<PK>>
+    +visitor_name: String
+    +id_number: String <<UNIQUE>>
+    +contact_number: String
+    +entry_time: Date
+    +exit_time: Date
+    +entry_method: EntryMethod
+  }
+
+  class Reservation {
+    +reservation_id: String <<PK>>
+    +visitor_id: String <<FK>>
+    +reservation_date: Date
+    +entry_time_slot: String
+    +group_size: Integer
+    +reservation_status: ReservationStatus
+    +ticket_amount: Double
+    +payment_status: PaymentStatus
+  }
+
+  class VisitorTrajectory {
+    +trajectory_id: String <<PK>>
+    +visitor_id: String <<FK>>
+    +location_time: DateTime
+    +longitude: Double
+    +latitude: Double
+    +region_id: String <<FK>>
+    +is_out_of_route: Boolean
+  }
+
+  class FlowControl {
+    +region_id: String <<PK, FK>>
+    +daily_capacity: Integer
+    +current_visitor_count: Integer
+    +warning_threshold: Integer
+    +flow_status: FlowStatus
+  }
+}
+
+' =========================================================
+' Law Enforcement
+' =========================================================
+package "Law Enforcement" as Law {
+  class LawEnforcementOfficer {
+    +law_id: String <<PK>>
+    +name: String
+    +department: String
+    +authority: String
+    +contact: String
+    +device_id: String
+    +user_id: String <<FK>>
+  }
+
+  class VideoMonitorPoint {
+    +monitor_id: String <<PK>>
+    +region_id: String <<FK>>
+    +latitude: Decimal
+    +longitude: Decimal
+    +monitor_range: String
+    +device_status: String
+    +storage_cycle: Integer
+  }
+
+  class IllegalBehaviorRecord {
+    +record_id: String <<PK>>
+    +behavior_type: String
+    +occur_time: DateTime
+    +region_id: String <<FK>>
+    +monitor_id: String <<FK>>
+    +evidence_path: String
+    +process_status: ProcessStatus
+    +law_id: String <<FK>>
+    +process_result: String
+    +punishment_basis: String
+  }
+
+  class LawEnforcementDispatch {
+    +dispatch_id: String <<PK>>
+    +record_id: String <<FK>>
+    +law_id: String <<FK>>
+    +dispatch_time: DateTime
+    +response_time: DateTime
+    +finish_time: DateTime
+    +dispatch_status: DispatchStatus
+  }
+}
+
+' =========================================================
+' Research Support
+' =========================================================
+package "Research Support" as Res {
+  class ResearchProject {
+    +project_id: String <<PK>>
+    +project_name: String <<UNIQUE>>
+    +leader_id: String <<FK>>
+    +apply_organization: String
+    +approval_date: Date
+    +completion_date: Date
+    +project_status: ProjectStatus
+    +research_field: String
+    +description: Text
+  }
+
+  class ResearchDataRecord {
+    +collection_id: String <<PK>>
+    +project_id: String <<FK>>
+    +collector_id: String <<FK>>
+    +collection_time: DateTime
+    +region_id: String <<FK>>
+    +collection_content: Text
+    +data_source: DataSource
+    +sample_id: String
+    +monitoring_data_id: String
+    +data_file_path: String
+    +remarks: Text
+    +is_verified: Boolean
+    +verified_by: String <<FK>>
+    +verified_at: DateTime
+  }
+
+  class ResearchAchievement {
+    +achievement_id: String <<PK>>
+    +project_id: String <<FK>>
+    +achievement_type: AchievementType
+    +achievement_name: String
+    +submit_time: Date
+    +file_path: String
+    +share_permission: SharePermission
+  }
+}
+
+' =========================================================
+' Layout helpers (把同包核心类绑紧，减少被拆散导致的穿线)
+' =========================================================
+together {
+  Shared.Region
+  Shared.User
+  Shared.MonitoringDevice
+}
+
+together {
+  Bio.Habitat
+  Bio.Species
+  Bio.MonitoringRecord
+  Bio.HabitatPrimarySpecies
+}
+
+together {
+  Env.MonitoringIndicator
+  Env.EnvironmentalData
+  Env.Alert
+  Env.CalibrationRecord
+}
+
+together {
+  Vis.Visitor
+  Vis.Reservation
+  Vis.VisitorTrajectory
+  Vis.FlowControl
+}
+
+together {
+  Law.VideoMonitorPoint
+  Law.IllegalBehaviorRecord
+  Law.LawEnforcementDispatch
+  Law.LawEnforcementOfficer
+}
+
+together {
+  Res.ResearchProject
+  Res.ResearchDataRecord
+  Res.ResearchAchievement
+}
+
+' =========================================================
+' Relationships (重排 + 线型分层)
+' 1) Shared -> Others (跨包FK，用 -->)
+' 2) Package internal (包内结构，用 --)
+' 3) Soft references (软引用，用 ..>)
+' =========================================================
+
+' ---------- 1) Shared -> Others (global anchors) ----------
+Shared.Region "1" --> "0..*" Shared.MonitoringDevice : deploys
+Shared.Region "1" --> "0..*" Bio.Habitat : contains
+Shared.Region "1" --> "0..*" Env.EnvironmentalData : contains
+Shared.Region "1" --> "0..*" Vis.VisitorTrajectory : locates_in
+Shared.Region "1" --> "0..1" Vis.FlowControl : controls
+Shared.Region "1" --> "0..*" Law.VideoMonitorPoint : contains
+Shared.Region "1" --> "0..*" Law.IllegalBehaviorRecord : occurs_in
+Shared.Region "1" --> "0..*" Res.ResearchDataRecord : collected_in
+
+Shared.User "1" --> "0..*" Bio.MonitoringRecord : records
+Shared.User "1" --> "0..*" Env.CalibrationRecord : performs
+Shared.User "1" --> "0..*" Res.ResearchProject : leads
+Shared.User "1" --> "0..*" Res.ResearchDataRecord : collects
+Shared.User "1" --> "0..*" Res.ResearchDataRecord : verifies
+
+Shared.MonitoringDevice "0..1" --> "0..*" Bio.MonitoringRecord : generates
+Shared.MonitoringDevice "1" --> "0..*" Env.EnvironmentalData : collects
+Shared.MonitoringDevice "1" --> "0..*" Env.CalibrationRecord : has
+
+' ---------- 2) Package internal (keep local structure clear) ----------
+' Biodiversity
+Bio.Habitat "1" -- "0..*" Bio.Species : contains
+Bio.Species "1" -- "0..*" Bio.MonitoringRecord : observed
+Bio.Habitat "1" -- "0..*" Bio.HabitatPrimarySpecies
+Bio.Species "1" -- "0..*" Bio.HabitatPrimarySpecies
+
+' Environment
+Env.MonitoringIndicator "1" -- "0..*" Env.EnvironmentalData : measures
+Env.EnvironmentalData "1" -- "0..1" Env.Alert : triggers
+
+' Visitor
+Vis.Visitor "1" -- "0..*" Vis.Reservation : makes
+Vis.Visitor "1" -- "0..*" Vis.VisitorTrajectory : generates
+
+' Law enforcement
+Law.VideoMonitorPoint "1" -- "0..*" Law.IllegalBehaviorRecord : evidence_from
+Law.LawEnforcementOfficer "1" -- "0..*" Law.IllegalBehaviorRecord : processes
+Law.IllegalBehaviorRecord "1" -- "1..*" Law.LawEnforcementDispatch : generates
+Law.LawEnforcementOfficer "1" -- "0..*" Law.LawEnforcementDispatch : handles
+
+' Research
+Res.ResearchProject "1" -- "0..*" Res.ResearchDataRecord : has
+Res.ResearchProject "1" -- "0..*" Res.ResearchAchievement : produces
+Res.ResearchDataRecord "0..*" ..> Bio.MonitoringRecord : adopt
+
+' ---------- 3) Soft references (弱关系，保持虚线) ----------
+Res.ResearchDataRecord "0..*" ..> Env.EnvironmentalData : may_reference
+
+@enduml
