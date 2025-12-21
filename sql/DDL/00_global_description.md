@@ -1,6 +1,6 @@
 # 数据库关系模式与范式分析
 
-## 一、关系模式设计（Relation Schema）
+## 一、关系模式设计
 
 ### 1. Region（区域信息表）
 
@@ -92,5 +92,6 @@ Region、User、MonitoringDevice 均满足第二范式（2NF）
 Region、User、MonitoringDevice 均满足第三范式（3NF）
 
 ---
+
 
 
