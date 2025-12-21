@@ -1,62 +1,83 @@
 @startuml
 title 执法监管业务线 UML 类图
-
 '==============================
-' 执法人员
+' 执法人员（Law_Enforcement_Officer）
 '==============================
 class LawEnforcementOfficer {
-  +lawId : String
-  +name : String
-  +department : String
-  +authority : String
-  +contact : String
-  +deviceId : String
+  # lawId : String  // 主键（PK）
+  + name : String
+  + department : String
+  + authority : String
+  + contact : String
+  + deviceId : String  // 外键（FK -> LawDevice.deviceId）
 }
-
 '==============================
-' 视频监控点
+' 执法设备（Law_device）
+'==============================
+class LawDevice {
+  # deviceId : String  // 主键（PK）
+  + deviceStatus : String
+  + deviceType : String
+  + deviceModel : String
+  + purchaseDate : Date
+}
+'==============================
+' 视频监控点（Video_Monitor_Point）
 '==============================
 class VideoMonitorPoint {
-  +monitorId : String
-  +regionId : String
-  +latitude : Decimal
-  +longitude : Decimal
-  +monitorRange : String
-  +deviceStatus : String
-  +storageCycle : Integer
+  # monitorId : String  // 主键（PK）
+  + regionId : String
+  + latitude : Decimal
+  + longitude : Decimal
+  + monitorRange : String
+  + deviceId : String  // 外键（FK -> LawDevice.deviceId）
+  + storageCycle : Integer
 }
-
 '==============================
-' 非法行为记录
+' 非法行为记录（Illegal_Behavior_Record）
 '==============================
 class IllegalBehaviorRecord {
-  +recordId : String
-  +behaviorType : String
-  +occurTime : DateTime
-  +regionId : String
-  +evidencePath : String
-  +processStatus : String
-  +processResult : String
-  +punishmentBasis : String
+  # recordId : String  // 主键（PK）
+  + behaviorType : String
+  + occurTime : DateTime
+  + regionId : String
+  + evidencePath : String
+  + processStatus : String
+  + lawId : String  // 外键（FK -> LawEnforcementOfficer.lawId）
+  + processResult : String
+  + punishmentBasis : String
+  + monitorId : String  // 外键（FK -> VideoMonitorPoint.monitorId）
 }
-
 '==============================
-' 执法调度信息
+' 执法调度信息（Law_Enforcement_Dispatch）
 '==============================
 class LawEnforcementDispatch {
-  +dispatchId : String
-  +dispatchTime : DateTime
-  +responseTime : DateTime
-  +finishTime : DateTime
-  +dispatchStatus : String
+  # dispatchId : String  // 主键（PK）
+  + recordId : String  // 外键（FK -> IllegalBehaviorRecord.recordId）
+  + lawId : String  // 外键（FK -> LawEnforcementOfficer.lawId）
+  + dispatchTime : DateTime
+  + responseTime : DateTime
+  + finishTime : DateTime
+  + dispatchStatus : String
 }
-
 '==============================
-' 类之间的关系
+' 类之间的关联关系（基于外键约束）
 '==============================
+' 执法设备 ↔ 执法人员（1个设备可分配给多个人员，1个人员关联1个设备）
+LawDevice "1" -- "0..*" LawEnforcementOfficer : 分配给
 
-VideoMonitorPoint "1" -- "0..*" IllegalBehaviorRecord : provides evidence
-IllegalBehaviorRecord "1" -- "1..*" LawEnforcementDispatch : generates
-LawEnforcementOfficer "1" -- "0..*" LawEnforcementDispatch : handles
-LawEnforcementOfficer "1" -- "0..*" IllegalBehaviorRecord : processes
+' 执法设备 ↔ 视频监控点（1个设备可对应多个监控点，1个监控点关联1个设备）
+LawDevice "1" -- "0..*" VideoMonitorPoint : 关联
+
+' 视频监控点 ↔ 非法行为记录（1个监控点可提供多条记录证据，1条记录关联1个监控点）
+VideoMonitorPoint "1" -- "0..*" IllegalBehaviorRecord : 提供证据
+
+' 非法行为记录 ↔ 执法调度（1条记录可触发多个调度，1个调度关联1条记录）
+IllegalBehaviorRecord "1" -- "1..*" LawEnforcementDispatch : 触发
+
+' 执法人员 ↔ 执法调度（1个人员可处理多个调度，1个调度关联1个人员）
+LawEnforcementOfficer "1" -- "0..*" LawEnforcementDispatch : 处理
+
+' 执法人员 ↔ 非法行为记录（1个人员可处理多条记录，1条记录关联1个人员）
+LawEnforcementOfficer "1" -- "0..*" IllegalBehaviorRecord : 经办
 @enduml
