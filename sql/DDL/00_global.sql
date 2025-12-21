@@ -25,6 +25,8 @@ CREATE TABLE MonitoringDevice (
     region_id              VARCHAR(64)  NULL,
 
     CONSTRAINT pk_monitoring_device PRIMARY KEY (device_id),
+    CONSTRAINT chk_run_status
+        CHECK (run_status IN ('正常', '故障', '离线')),
     CONSTRAINT fk_device_region
         FOREIGN KEY (region_id)
         REFERENCES Region(region_id)
