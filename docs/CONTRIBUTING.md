@@ -3,7 +3,7 @@
 > 数据库系统课程设计 · 团队协作与工程规范
 
 ---
-## 1. 目的说明
+## 1 目的说明
 
 为保证 **国家公园管理系统数据库课程设计** 项目在开发、设计与文档编写过程中的一致性、可维护性与可追溯性，特制定本协作规范文档。
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 2. Git 提交（push / commit）命名规范
+## 2 Git 提交（push / commit）命名规范
 
 ### 2.1 基本格式（必须遵守）
 
@@ -61,7 +61,7 @@ fix bug
 
 ---
 
-## 3. 分支使用规范（极简版）
+## 3 分支使用规范（极简版）
 
 ### 3.1 总原则（所有成员必须遵守）
 - main 分支：稳定版本，只合并阶段性成果（不直接开发，不 force push）
@@ -117,27 +117,27 @@ fix bug
 ---
 
 ### 3.6 示例（✅ 推荐照抄）
-#### Stage 1（需求分析 & UML）
+#### 3.6.1 Stage 1（需求分析 & UML）
 - docs/biodiversity-stage1
 - docs/environment-stage1
 - docs/law-enforcement-stage1
 - docs/research-stage1
 
-#### Stage 2（表结构 & DDL）
+#### 3.6.2 Stage 2（表结构 & DDL）
 - sql/biodiversity-stage2
 - sql/visitor-stage2
 - sql/environment-stage2
 
-#### Stage 3（SQL / 代码 / 测试）
+#### 3.6.3 Stage 3（SQL / 代码 / 测试）
 - sql/biodiversity-stage3
 - feat/visitor-stage3
 - test/environment-stage3
 
-#### 修复（针对已合并阶段）
+#### 3.6.4 修复（针对已合并阶段）
 - fix/biodiversity-stage1
 - fix/sql-stage2
 
-#### 工程杂项
+#### 3.6.5 工程杂项
 - chore/global-stage1
 - chore/global-stage3
 
@@ -152,11 +152,11 @@ fix bug
 
 ---
 
-## 何时必须创建分支（重要）
+### 4 何时必须创建分支（重要）
 
 为避免协作混乱、降低返工成本，项目约定在以下情况 **必须创建新分支，并通过 Pull Request 合并到 main 分支**：
 
-### 必须开分支的情况
+#### 4.1 必须开分支的情况
 - **修改项目规则或协作规范**  
   例如：`CONTRIBUTING.md`、命名规范、协作流程说明等。
 - **调整项目目录结构**  
@@ -168,7 +168,7 @@ fix bug
 - **一次性改动内容较多**  
   单次工作涉及多个文件或多个模块，影响范围不清晰时。
 
-### 可以直接提交到 main 的情况
+#### 4.2 可以直接提交到 main 的情况
 - 新增会议记录、进度记录等过程性文档。
 - 补充已经约定好的设计图、截图、说明性材料，且不涉及规则变更。
 - 小幅度文字修正（如错别字、格式微调）。
@@ -177,10 +177,154 @@ fix bug
 > **改规则 / 改结构 / 改数据库 / 改公共内容 → 必须开分支 + PR**  
 > **只加材料 / 会议记录 / 小改文案 → 可直接提交 main**
 
+## 4. Issue 与 Pull Request 协作规范（核心流程）
 
-## 4. 文件与目录命名规范
+> 本项目采用 **Issue + Pull Request** 的方式进行任务管理与成果验收。  
+> 所有成员 **必须** 按以下流程协作。
 
-### 4.1 通用原则（所有文件）
+---
+
+### 4.1 Issue 的使用规范（必须遵守）
+
+本仓库仅使用 **两类 Issue**：
+
+#### ① task（任务 Issue）
+
+用于：
+
+- 安排具体任务
+    
+- 定义完成标准（checklist）
+    
+- 设定截止时间
+    
+
+规则：
+
+- **每个任务必须对应一个 task Issue**
+    
+- task Issue 是该任务的 **唯一依据**
+    
+- 不在 Issue 里的任务 = 不存在该任务
+    
+
+---
+
+#### ② discussion（讨论 / 问题 Issue）
+
+用于：
+
+- 表结构、字段设计讨论
+    
+- 业务逻辑或 UML 设计分歧
+    
+- 实现过程中发现的问题或疑问
+    
+
+规则：
+
+- discussion Issue **不作为完成标志**
+    
+- 讨论有结论即可关闭
+    
+- 若讨论结论影响任务，应在对应 task Issue 中补充说明
+    
+
+---
+
+### 4.2 Pull Request（PR）使用规范（强制）
+
+> **完成任务的唯一方式是提交 Pull Request。**
+
+#### PR 必须满足以下条件，否则不会合并：
+
+- PR 必须关联对应的 task Issue  
+    （在 PR 描述中写：`Closes #Issue编号`）
+    
+- PR 内容必须覆盖 Issue 中的 checklist
+    
+- PR **必须由组长 review 后合并**
+    
+- **禁止自行 merge PR**
+    
+
+---
+
+### 4.3 PR Review 与 Merge 规则（非常重要）
+
+- PR 提交后：
+    
+    - 组长负责 review
+        
+    - 若存在问题，将在 PR 中评论指出
+        
+- **PR 有问题时：**
+    
+    - 不 merge
+        
+    - 不 close
+        
+    - 提交人直接在原 PR 上修改并 push
+        
+
+---
+
+### 4.4 严禁行为（明确禁止）
+
+以下行为 **不被允许**：
+
+- ❌ 直接向 `main` 分支 push
+    
+- ❌ 未经 review 自行 merge PR
+    
+- ❌ 未提交 PR 即视为任务完成
+    
+- ❌ 在 Issue 外私下交付成果（聊天、私发文件等）
+    
+
+> main 分支已启用保护规则，违反流程将无法合并。
+
+---
+
+### 4.5 特殊情况说明（流程补充）
+
+#### 1️⃣ 已合并但未走 PR 的历史情况
+
+- 仅作为流程过渡期的特例处理
+    
+- 后续不再允许类似操作
+    
+- 会在 Issue 中补充说明并手动关闭
+    
+
+#### 2️⃣ 到截止时间未提交 PR
+
+- 组长会在对应 Issue 中留言确认进度
+    
+- 必须在 Issue 中明确回复新的预计完成时间
+    
+- 延期以 Issue 中记录为准
+    
+
+---
+
+## 5. PR 模板使用说明（简化版）
+
+本仓库已提供统一 PR 模板，提交 PR 时请按模板填写。
+
+PR 中必须包含：
+
+- 本 PR 的目的说明
+    
+- 关联的 Issue（`Closes #Issue编号`）
+    
+- 自检确认（是否完全满足 Issue 要求）
+    
+
+未按模板填写的 PR，将被要求修改后再 review。
+## 5 文件与目录命名规范
+
+### 5.1 通用原则（所有文件）
 
 - **统一使用英文小写 + 下划线**
     
@@ -207,9 +351,9 @@ new file.sql
 
 ---
 
-### 4.2 SQL 文件命名规范（`/sql`）
+### 5.2 SQL 文件命名规范（`/sql`）
 
-#### 1️⃣ DDL（建表）
+#### 5.2.1 1️⃣ DDL（建表）
 
 ```text
 sql/ddl/<业务>_<对象>_table.sql
@@ -223,7 +367,7 @@ sql/ddl/habitat_table.sql
 sql/ddl/monitoring_record_table.sql
 ```
 
-#### 2️⃣ 查询语句
+#### 5.2.2 2️⃣ 查询语句
 
 ```text
 sql/queries/<业务>_<查询含义>.sql
@@ -236,7 +380,7 @@ sql/queries/biodiversity_recent_30days_statistics.sql
 sql/queries/habitat_suitability_analysis.sql
 ```
 
-#### 3️⃣ 视图 / 触发器 / 存储过程
+#### 5.2.3 3️⃣ 视图 / 触发器 / 存储过程
 
 ```text
 sql/views/<业务>_<view_name>.sql
@@ -246,7 +390,7 @@ sql/stored_procedures/<业务>_<procedure_name>.sql
 
 ---
 
-### 4.3 Python 文件命名规范（`/src`）
+### 5.3 Python 文件命名规范（`/src`）
 
 - 文件名：`snake_case`
     
@@ -264,9 +408,9 @@ visitor_flow_service.py
 
 ---
 
-### 4.4 UML / 用例图 / 鲁棒图命名规范（`/docs`）
+### 5.4 UML / 用例图 / 鲁棒图命名规范（`/docs`）
 
-#### UML 类图
+#### 5.4.1 UML 类图
 
 ```text
 docs/UML/<业务>_uml_class_diagram.png
@@ -278,13 +422,13 @@ docs/UML/<业务>_uml_class_diagram.png
 biodiversity_uml_class_diagram.png
 ```
 
-#### 用例图
+#### 5.4.2 用例图
 
 ```text
 docs/use_case_diagram/<业务>_use_case.png
 ```
 
-#### 鲁棒图
+#### 5.4.3 鲁棒图
 
 ```text
 docs/robustness_diagram/<业务>_robustness.png
@@ -292,7 +436,7 @@ docs/robustness_diagram/<业务>_robustness.png
 
 ---
 
-### 4.5 数据字典命名规范（`/docs/data_dictionary`）
+### 5.5 数据字典命名规范（`/docs/data_dictionary`）
 
 ```text
 <业务>_data_dictionary.xlsx
@@ -307,7 +451,7 @@ visitor_management_data_dictionary.xlsx
 
 ---
 
-## 5. 文档（Markdown / 报告）命名规范
+## 6 文档（Markdown / 报告）命名规范
 
 - Markdown：`snake_case.md`
     
@@ -324,7 +468,7 @@ group_report_v1.0.docx
 
 ---
 
-## 6. 提交前自检清单（强烈建议）
+## 7 提交前自检清单（强烈建议）
 
 在 push 前，请确认：
 
@@ -358,13 +502,13 @@ group_report_v1.0.docx
 
 ---
 
-## A — 生物多样性监测业务线（组长 A）
+## 1 A — 生物多样性监测业务线（组长 A）
 
 **关键词前缀统一：`biodiversity`**
 
-### 1️⃣ SQL（A 负责）
+### 1.1 1️⃣ SQL（A 负责）
 
-#### 表结构（DDL）
+#### 1.1.1 表结构（DDL）
 
 ```text
 sql/ddl/biodiversity_species_table.sql
@@ -372,14 +516,14 @@ sql/ddl/biodiversity_habitat_table.sql
 sql/ddl/biodiversity_monitoring_record_table.sql
 ```
 
-#### 查询 SQL
+#### 1.1.2 查询 SQL
 
 ```text
 sql/queries/biodiversity_recent_30days_statistics.sql
 sql/queries/biodiversity_species_distribution.sql
 ```
 
-#### 视图 / 触发器 / 存储过程
+#### 1.1.3 视图 / 触发器 / 存储过程
 
 ```text
 sql/views/biodiversity_species_level_view.sql
@@ -389,7 +533,7 @@ sql/stored_procedures/biodiversity_data_review_procedure.sql
 
 ---
 
-### 2️⃣ UML / 图类文档
+### 1.2 2️⃣ UML / 图类文档
 
 ```text
 docs/UML/biodiversity_uml_class_diagram.png
@@ -399,7 +543,7 @@ docs/robustness_diagram/biodiversity_robustness.png
 
 ---
 
-### 3️⃣ 数据字典
+### 1.3 3️⃣ 数据字典
 
 ```text
 docs/data_dictionary/biodiversity_data_dictionary.xlsx
@@ -407,7 +551,7 @@ docs/data_dictionary/biodiversity_data_dictionary.xlsx
 
 ---
 
-## B — 生态环境监测业务线（组员 B）
+## 2 B — 生态环境监测业务线（组员 B）
 
 **关键词前缀统一：`environment`**
 
@@ -425,7 +569,7 @@ docs/data_dictionary/environment_data_dictionary.xlsx
 
 ---
 
-## C — 游客智能管理业务线（组员 C）
+## 3 C — 游客智能管理业务线（组员 C）
 
 **关键词前缀统一：`visitor`**
 
@@ -444,7 +588,7 @@ docs/data_dictionary/visitor_data_dictionary.xlsx
 
 ---
 
-## D — 执法监管业务线（组员 D）
+## 4 D — 执法监管业务线（组员 D）
 
 **关键词前缀统一：`law_enforcement`**
 
@@ -463,7 +607,7 @@ docs/data_dictionary/law_enforcement_data_dictionary.xlsx
 
 ---
 
-## E — 科研数据支撑业务线（组员 E）
+## 5 E — 科研数据支撑业务线（组员 E）
 
 **关键词前缀统一：`research`**
 
@@ -482,7 +626,7 @@ docs/data_dictionary/research_data_dictionary.xlsx
 
 ---
 
-## 统一规则总结
+## 6 统一规则总结
 
 > - 每条业务线使用**唯一英文前缀**
 >     
