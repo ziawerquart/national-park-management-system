@@ -6,7 +6,7 @@ skinparam linetype ortho
 left to right direction
 
 ' =========================
-' Enums (Global)
+' Enums (Global)`
 ' =========================
 enum UserRole {
   ecological_monitor
@@ -464,9 +464,9 @@ Law.LawEnforcementOfficer "1" -- "0..*" Law.LawEnforcementDispatch : handles
 ' Research
 Res.ResearchProject "1" -- "0..*" Res.ResearchDataRecord : has
 Res.ResearchProject "1" -- "0..*" Res.ResearchAchievement : produces
+Res.ResearchDataRecord "0..*" ..> Bio.MonitoringRecord : adopt
 
 ' ---------- 3) Soft references (弱关系，保持虚线) ----------
-Res.ResearchDataRecord "0..*" ..> Bio.MonitoringRecord : may_reference
 Res.ResearchDataRecord "0..*" ..> Env.EnvironmentalData : may_reference
 
 @enduml
