@@ -1,121 +1,91 @@
-@startuml
-skinparam classAttributeIconSize 0
+@startuml research_system_final
 
-' =========================
-' Core Domain Classes (from group UML)
-' =========================
-
-class Species {
-  species_id : String
-  scientific_name : String
-  common_name : String
-  protection_level : String
+' 枚举类型定义
+enum ProjectStatus <<(E,orchid)>> {
+  在研
+  已结题
+  暂停
 }
 
-class Habitat {
-  habitat_id : String
-  habitat_name : String
-  region_code : String
+enum DataSource <<(E,orchid)>> {
+  实地采集
+  系统调用
 }
 
-class MonitoringRecord {
-  record_id : String
-  monitor_time : DateTime
-  data_type : String
-  data_value : String
+enum AchievementType <<(E,orchid)>> {
+  论文
+  报告
+  专利
+  数据集
+  专著
 }
 
-class User {
+enum SharePermission <<(E,orchid)>> {
+  公开
+  内部共享
+  保密
+}
+
+' 用户类
+class User <<(C,lightblue)>> {
   user_id : String
-  name : String
+  user_name : String
   role : String
 }
 
-class HabitatPrimarySpecies {
-  id : String
-}
-
-' =========================
-' Research Business Classes
-' =========================
-
-class ResearchProject {
+' 研究项目类
+class ResearchProject <<(C,lightblue)>> {
   project_id : String
   project_name : String
-  principal_investigator_id : String
-  applicant_organization : String
-  start_time : Date
-  end_time : Date
+  leader_id : String
+  apply_organization : String
+  approval_date : Date
+  completion_date : Date
   project_status : ProjectStatus
   research_field : String
+  description : String
 }
 
-class ResearchDataCollection {
+' 研究数据采集类
+class ResearchDataRecord <<(C,lightblue)>> {
   collection_id : String
-  collection_time : DateTime
+  project_id : String
   collector_id : String
-  area_id : String
+  collection_time : DateTime
+  region_id : String
   collection_content : String
   data_source : DataSource
+  sample_id : String
+  monitoring_data_id : String
+  data_file_path : String
+  remarks : String
+  is_verified : Boolean
+  verified_by : String
+  verified_at : DateTime
 }
 
-class ResearchResult {
-  result_id : String
-  result_type : ResultType
-  result_name : String
-  publish_time : Date
-  access_level : AccessLevel
+' 研究成果类
+class ResearchAchievement <<(C,lightblue)>> {
+  achievement_id : String
+  project_id : String
+  achievement_type : AchievementType
+  achievement_name : String
+  submit_time : Date
   file_path : String
+  share_permission : SharePermission
 }
 
-' =========================
-' Enumerations
-' =========================
-
-enum ProjectStatus {
-  InProgress
-  Completed
-  Suspended
-}
-
-enum DataSource {
-  FieldCollection
-  SystemReference
-}
-
-enum ResultType {
-  Paper
-  Report
-  Patent
-  Other
-}
-
-enum AccessLevel {
-  Public
-  Internal
-  Confidential
-}
-
-' =========================
-' Associations
-' =========================
-
-' --- Ecology Core Relations ---
-Habitat "1" -- "0..*" MonitoringRecord : contains
-Species "1" -- "0..*" MonitoringRecord : observed_in
-Habitat "1" -- "0..*" HabitatPrimarySpecies
-Species "1" -- "0..*" HabitatPrimarySpecies
-
-User "1" -- "0..*" MonitoringRecord : records
-
-' --- Research Business Relations ---
-ResearchProject "1" o-- "0..*" ResearchDataCollection : has
-ResearchProject "1" o-- "0..*" ResearchResult : produces
-
+' 关系定义
 User "1" -- "0..*" ResearchProject : leads
-User "1" -- "0..*" ResearchDataCollection : collects
+User "1" -- "0..*" ResearchDataRecord : collects
+User "1" -- "0..*" ResearchDataRecord : verifies
+ResearchProject "1" -- "0..*" ResearchDataRecord : has
+ResearchProject "1" -- "0..*" ResearchAchievement : produces
 
-' --- Data Reuse Relation ---
-ResearchDataCollection "0..*" ..> "0..*" MonitoringRecord : references
+' 枚举关系
+ResearchProject -- ProjectStatus
+ResearchDataRecord -- DataSource
+ResearchAchievement -- AchievementType
+ResearchAchievement -- SharePermission
 
 @enduml
