@@ -1,7 +1,11 @@
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 SET collation_connection = 'utf8mb4_0900_ai_ci';
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS national_park_db CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
+-- 使用该数据库
+USE national_park_db;
 /* =====================================================
    业务线一：Shared / Global（全局基础数据）
    说明：
