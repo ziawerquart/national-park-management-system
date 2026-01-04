@@ -2,7 +2,7 @@
 
 ## sp_check_project_completion - 项目结题检查
 
-**适用范围：** 在项目申请结题前，检查是否满足结题条件（必须有采集记录和成果产出）。
+**适用范围：** 在项目申请结题前，检查是否满足结题条件：必须有数据记录、有成果产出、且所有数据记录已审核。
 
 **参数：**
 - `p_project_id` (IN): 项目ID
@@ -21,16 +21,16 @@ SELECT @can, @msg;
 
 ---
 
-## sp_export_results_by_access - 按访问级别导出成果清单
+## sp_export_achievements_by_permission - 按共享权限导出成果清单
 
-**适用范围：** 根据指定的访问级别（Public/Internal/Restricted）导出成果列表，包含项目和负责人信息。
+**适用范围：** 根据指定的共享权限（public/internal/confidential）导出成果列表，包含项目和负责人信息。
 
 **参数：**
-- `p_access_level` (IN): 访问级别
+- `p_permission` (IN): 共享权限
 
 **调用示例：**
 ```sql
-CALL sp_export_results_by_access('Public');
+CALL sp_export_achievements_by_permission('public');
 ```
 
 **使用场景：**

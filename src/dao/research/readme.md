@@ -1,193 +1,111 @@
+# 科研支撑模块 DAO
 
-# 生物多样性模块（Biodiversity）— DAO 与单元测试说明
+数据访问对象层，封装 `ResearchProject` 和 `ResearchDataRecord` 表的 CRUD 操作。
 
-本目录提供 **biodiversity 模块**相关表的 **DAO（数据访问层 / 持久层）** 及其 **unittest 单元测试**，用于验证：
-
-* 数据库表结构（DDL）正确
-* 生物多样性模块种子数据（DML）可用
-* DAO 的核心 CRUD 与业务查询逻辑可正常运行
-* **仅覆盖 biodiversity 模块，不包含 research 等其他模块**
-
----
-
-## 📁 项目目录结构
+## 文件结构
 
 ```
-project/
-├─ src/
-│  ├─ dao/
-│  │  └─ biodiversity/
-│  │     ├─ base_dao.py
-│  │     ├─ habitat_dao.py
-│  │     ├─ species_dao.py
-│  │     ├─ habitat_primary_species_dao.py
-│  │     └─ monitoring_record_dao.py
-│  └─ test/
-│     └─ biodiversity/
-│        ├─ common.py
-│        ├─ test_habitat_dao.py
-│        ├─ test_species_dao.py
-│        ├─ test_habitat_primary_species_dao.py
-│        └─ test_monitoring_record_dao.py
+src/dao/research/
+├── __init__.py
+├── base_dao.py                 # 基础DAO类
+├── research_project_dao.py     # 研究项目DAO
+└── research_data_record_dao.py # 数据采集记录DAO
 ```
 
----
+## 快速开始
 
-## ✅ 前置条件（必须全部满足）
+```python
+from dao.research import ResearchProjectDAO, ResearchDataRecordDAO
 
-1. **MySQL 服务已启动**
-2. **已创建数据库并执行 DDL**
+config = {
+    'host': 'localhost',
+    'port': 3306,
+    'user': 'root',
+    'password': 'your_password',
+    'database': 'national_park_db'
+}
 
-   * 例如：`99_all_in_one.sql`
-3. **已导入 biodiversity 种子数据（DML）**
-
-   * 推荐使用 *相对时间版 seed*（如 `10_biodiversity_seed_relative_time.sql`）
-4. **Python 环境已安装依赖**
-
-   ```bash
-   pip install pymysql
-   ```
-
----
-
-## 🔧 数据库连接配置（PowerShell）
-
-在 **项目根目录** 执行（仅当前终端会话生效）：
-
-```powershell
-$env:DB_HOST="localhost"
-$env:DB_PORT="3306"
-$env:DB_USER="root"
-$env:DB_PASSWORD="你的MySQL密码"
-$env:DB_NAME="national_park_db"
+project_dao = ResearchProjectDAO(config)
+record_dao = ResearchDataRecordDAO(config)
 ```
 
-> ⚠️ 注意
->
-> * `DB_PASSWORD` 必须是真实密码
-> * 测试使用的是 **root@localhost**
+## API 说明
 
----
+### ResearchProjectDAO
 
-## 🧪 如何运行 biodiversity 模块的测试（推荐方式）
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `create(data)` | dict | str (project_id) | 创建项目 |
+| `find_by_id(id)` | str | dict \| None | 按ID查询 |
+| `find_all(limit, offset)` | int, int | list[dict] | 分页查询 |
+| `find_by_status(status)` | str | list[dict] | 按状态查询 |
+| `find_by_leader(leader_id)` | str | list[dict] | 按负责人查询 |
+| `update(id, data)` | str, dict | int (affected rows) | 更新项目 |
+| `delete(id)` | str | int | 删除项目 |
+| `count_by_status()` | - | list[dict] | 按状态统计 |
+| `exists(id)` | str | bool | 判断是否存在 |
 
-### ✅ 方式一：逐个模块运行（最清晰、最稳定）
+**create 必填字段：** `project_id`, `project_name`, `leader_id`, `approval_date`, `project_status`
 
-```powershell
-python -m unittest -v src.test.biodiversity.test_species_dao
-python -m unittest -v src.test.biodiversity.test_habitat_dao
-python -m unittest -v src.test.biodiversity.test_monitoring_record_dao
-python -m unittest -v src.test.biodiversity.test_habitat_primary_species_dao
+**project_status 枚举值：** `ongoing`, `completed`, `paused`
+
+### ResearchDataRecordDAO
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `create(data)` | dict | str (collection_id) | 创建记录 |
+| `find_by_id(id)` | str | dict \| None | 按ID查询 |
+| `find_all(limit, offset)` | int, int | list[dict] | 分页查询 |
+| `find_by_project(project_id)` | str | list[dict] | 按项目查询 |
+| `find_by_collector(collector_id)` | str | list[dict] | 按采集员查询 |
+| `find_by_region(region_id)` | str | list[dict] | 按区域查询 |
+| `find_by_time_range(start, end)` | datetime, datetime | list[dict] | 按时间范围查询 |
+| `update(id, data)` | str, dict | int | 更新记录 |
+| `delete(id)` | str | int | 删除记录 |
+| `count_by_source()` | - | list[dict] | 按数据来源统计 |
+| `exists(id)` | str | bool | 判断是否存在 |
+
+**create 必填字段：** `collection_id`, `project_id`, `collector_id`, `collection_time`, `region_id`, `data_source`
+
+**data_source 枚举值：** `field`, `system`
+
+## 使用示例
+
+```python
+# 创建项目
+project_dao.create({
+    'project_id': 'P001',
+    'project_name': '大熊猫保护研究',
+    'leader_id': 'U001',
+    'approval_date': '2024-01-01',
+    'project_status': 'ongoing',
+    'research_field': '生态学'
+})
+
+# 查询进行中的项目
+ongoing = project_dao.find_by_status('ongoing')
+
+# 创建数据记录
+record_dao.create({
+    'collection_id': 'C001',
+    'project_id': 'P001',
+    'collector_id': 'U002',
+    'collection_time': '2024-06-01 10:00:00',
+    'region_id': 'R001',
+    'data_source': 'field',
+    'collection_content': '野外调查数据'
+})
+
+# 更新审核状态
+record_dao.update('C001', {
+    'is_verified': True,
+    'verified_by': 'U001',
+    'verified_at': '2024-06-02 10:00:00'
+})
 ```
 
-这是**最推荐**的方式，与你最终成功运行的命令完全一致。
+## 依赖
 
----
-
-### ✅ 方式二：一次性跑 biodiversity 全部测试
-
-```powershell
-python -m unittest discover -s src/test -t src -p "test_*.py" -v
 ```
-
-说明：
-
-* `-t src`：告诉 unittest **顶层包是 `src`**
-* `-s src/test`：从 `src.test` 开始发现测试
-* 该命令会同时发现 `biodiversity` 和其他模块
-  👉 **只要 biodiversity 全部 OK，就视为本模块通过**
-
----
-
-## ✅ 实际通过的测试结果（示例）
-
-```text
-test_species_dao ................ OK
-test_habitat_dao ................ OK
-test_monitoring_record_dao ...... OK
-test_habitat_primary_species_dao  OK
+pymysql>=1.0.0
 ```
-
-这表示：
-
-* biodiversity 模块的 **所有 DAO 均已通过单元测试**
-* DAO 实现、SQL、事务、连接方式均正常
-
----
-
-## 📊 DAO 覆盖范围说明
-
-### `SpeciesDAO`
-
-* create
-* find_by_id
-* update
-
-### `HabitatDAO`
-
-* create
-* find_by_id
-* update
-* delete
-
-### `HabitatPrimarySpeciesDAO`（N:M 中间表）
-
-* create
-* find_by_pk
-* update
-* delete
-
-### `MonitoringRecordDAO`（生物多样性模块）
-
-* create
-* update_status
-* find_pending_list_recent
-  👉 对应「**待核实（to_verify）监测记录列表**」业务用例
-
----
-
-## ⚠️ 注意事项（很重要）
-
-1. **测试会真实写入数据库**
-
-   * 测试数据统一使用 `TST_` 前缀主键
-   * 每个测试用例结束后会自动清理
-
-2. **只保证 biodiversity 模块**
-
-3. **外键依赖说明**
-
-   * seed 中需至少包含以下基础数据：
-
-     * Region
-     * Habitat
-     * Species
-     * User（ecological_monitor）
-     * MonitoringDevice（如存在）
-
----
-
-## 🛠️ 常见错误与排查
-
-### ❌ `attempted relative import with no known parent package`
-
-* 原因：未使用 `-t src`，或直接在子目录 discover
-* 解决：**始终从项目根目录运行 unittest**
-
-### ❌ `Access denied for user 'root'@'localhost'`
-
-* 原因：数据库密码错误 / MySQL 未启动
-* 解决：重新设置 `DB_PASSWORD`
-
-### ❌ `Table doesn't exist`
-
-* 原因：DDL 未执行或执行到错误的数据库
-* 解决：确认 `USE national_park_db;`
-
----
-
-## ✅ 总结
-
-> 生物多样性（biodiversity）模块已完成 DAO 层实现，
-> 覆盖 Species、Habitat、MonitoringRecord 及其关联表，
-> 并通过 unittest 单元测试验证，测试结果均为 **OK**。

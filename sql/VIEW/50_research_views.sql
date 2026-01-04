@@ -8,60 +8,58 @@ SELECT
     p.project_id,
     p.project_name,
     p.project_status,
-    p.start_time,
-    p.end_time,
-    u.name AS leader_name,
-    COUNT(DISTINCT c.collection_id) AS collection_count,
-    COUNT(DISTINCT r.result_id) AS result_count
+    p.approval_date,
+    p.completion_date,
+    u.user_name AS leader_name,
+    p.research_field,
+    COUNT(DISTINCT r.collection_id) AS record_count,
+    COUNT(DISTINCT a.achievement_id) AS achievement_count
 FROM ResearchProject p
-LEFT JOIN User u ON p.leader_user_id = u.user_id
-LEFT JOIN ResearchDataCollection c ON p.project_id = c.project_id
-LEFT JOIN ResearchResult r ON p.project_id = r.project_id
-GROUP BY p.project_id, p.project_name, p.project_status, p.start_time, p.end_time, u.name;
+LEFT JOIN `User` u ON p.leader_id = u.user_id
+LEFT JOIN ResearchDataRecord r ON p.project_id = r.project_id
+LEFT JOIN ResearchAchievement a ON p.project_id = a.project_id
+GROUP BY p.project_id, p.project_name, p.project_status, p.approval_date, p.completion_date, u.user_name, p.research_field;
 
 -- VIEW 2: 数据采集汇总视图
-CREATE OR REPLACE VIEW v_collection_summary AS
+CREATE OR REPLACE VIEW v_record_summary AS
 SELECT 
-    c.project_id,
+    r.project_id,
     p.project_name,
-    c.data_source,
-    COUNT(*) AS collection_count,
-    MIN(c.collection_time) AS first_collection,
-    MAX(c.collection_time) AS last_collection,
-    COUNT(DISTINCT m.record_id) AS monitoring_record_count
-FROM ResearchDataCollection c
-JOIN ResearchProject p ON c.project_id = p.project_id
-LEFT JOIN MonitoringRecord m ON c.collection_id = m.collection_id
-GROUP BY c.project_id, p.project_name, c.data_source;
+    r.data_source,
+    rg.region_name,
+    COUNT(*) AS record_count,
+    SUM(r.is_verified) AS verified_count,
+    MIN(r.collection_time) AS first_collection,
+    MAX(r.collection_time) AS last_collection
+FROM ResearchDataRecord r
+JOIN ResearchProject p ON r.project_id = p.project_id
+JOIN Region rg ON r.region_id = rg.region_id
+GROUP BY r.project_id, p.project_name, r.data_source, rg.region_name;
 
 -- VIEW 3: 成果统计视图
-CREATE OR REPLACE VIEW v_result_statistics AS
+CREATE OR REPLACE VIEW v_achievement_statistics AS
 SELECT 
     p.project_id,
     p.project_name,
-    r.result_type,
-    r.access_level,
-    COUNT(*) AS result_count,
-    MIN(r.publish_time) AS earliest_publish,
-    MAX(r.publish_time) AS latest_publish
-FROM ResearchResult r
-JOIN ResearchProject p ON r.project_id = p.project_id
-GROUP BY p.project_id, p.project_name, r.result_type, r.access_level;
+    a.achievement_type,
+    a.share_permission,
+    COUNT(*) AS achievement_count,
+    MIN(a.submit_time) AS earliest_submit,
+    MAX(a.submit_time) AS latest_submit
+FROM ResearchAchievement a
+JOIN ResearchProject p ON a.project_id = p.project_id
+GROUP BY p.project_id, p.project_name, a.achievement_type, a.share_permission;
 
--- VIEW 4: 栖息地物种监测视图
-CREATE OR REPLACE VIEW v_habitat_species_monitoring AS
+-- VIEW 4: 数据采集员工作量视图
+CREATE OR REPLACE VIEW v_collector_workload AS
 SELECT 
-    h.habitat_id,
-    h.habitat_name,
-    h.region_code,
-    s.species_id,
-    s.scientific_name,
-    s.common_name,
-    s.protection_level,
-    COUNT(m.record_id) AS monitor_count,
-    MAX(m.monitor_time) AS last_monitor_time
-FROM Habitat h
-JOIN HabitatPrimarySpecies hps ON h.habitat_id = hps.habitat_id
-JOIN Species s ON hps.species_id = s.species_id
-LEFT JOIN MonitoringRecord m ON h.habitat_id = m.habitat_id AND s.species_id = m.species_id
-GROUP BY h.habitat_id, h.habitat_name, h.region_code, s.species_id, s.scientific_name, s.common_name, s.protection_level;
+    u.user_id,
+    u.user_name,
+    COUNT(r.collection_id) AS total_records,
+    SUM(r.is_verified) AS verified_records,
+    COUNT(DISTINCT r.project_id) AS project_count,
+    COUNT(DISTINCT r.region_id) AS region_count,
+    MAX(r.collection_time) AS last_collection_time
+FROM `User` u
+JOIN ResearchDataRecord r ON u.user_id = r.collector_id
+GROUP BY u.user_id, u.user_name;

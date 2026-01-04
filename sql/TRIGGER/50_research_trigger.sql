@@ -4,9 +4,9 @@
 
 DELIMITER //
 
--- 触发器: 项目状态为Completed时禁止新增采集记录
-CREATE TRIGGER tr_prevent_collection_on_completed
-BEFORE INSERT ON ResearchDataCollection
+-- 触发器: 项目状态为completed时禁止新增数据记录
+CREATE TRIGGER tr_prevent_record_on_completed
+BEFORE INSERT ON ResearchDataRecord
 FOR EACH ROW
 BEGIN
     DECLARE v_status VARCHAR(20);
@@ -14,19 +14,19 @@ BEGIN
     SELECT project_status INTO v_status 
     FROM ResearchProject WHERE project_id = NEW.project_id;
     
-    IF v_status = 'Completed' THEN
+    IF v_status = 'completed' THEN
         SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = '已结题项目不能新增采集记录';
+        SET MESSAGE_TEXT = '已结题项目不能新增数据记录';
     END IF;
 END //
 
--- 触发器: 成果插入时自动记录归档信息（通过更新publish_time为当前时间如果为空）
-CREATE TRIGGER tr_result_auto_archive
-BEFORE INSERT ON ResearchResult
+-- 触发器: 成果插入时自动设置提交时间为当前日期（如果为空）
+CREATE TRIGGER tr_achievement_auto_submit_time
+BEFORE INSERT ON ResearchAchievement
 FOR EACH ROW
 BEGIN
-    IF NEW.publish_time IS NULL THEN
-        SET NEW.publish_time = NOW();
+    IF NEW.submit_time IS NULL THEN
+        SET NEW.submit_time = CURDATE();
     END IF;
 END //
 
