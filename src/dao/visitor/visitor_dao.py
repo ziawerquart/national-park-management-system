@@ -1,76 +1,157 @@
-# src/dao/visitor/visitor_dao.py
-import mysql.connector
-from typing import Optional, List, Dict, Any
+"""
+Visitor 表的 DAO (Data Access Object)
+"""
+from typing import Optional, List
+from datetime import date
+from .database import get_db_connection
+
+
+class Visitor:
+    """Visitor 模型类"""
+
+    def __init__(self, visitor_id: str, visitor_name: str, id_number: str,
+                 contact_number: str, entry_time: date, exit_time: date,
+                 entry_method: str):
+        self.visitor_id = visitor_id
+        self.visitor_name = visitor_name
+        self.id_number = id_number
+        self.contact_number = contact_number
+        self.entry_time = entry_time
+        self.exit_time = exit_time
+        self.entry_method = entry_method
 
 
 class VisitorDAO:
-    def __init__(self, connection):
+    """Visitor 数据访问对象"""
+
+    @staticmethod
+    def create(visitor: Visitor) -> bool:
+        """创建新游客记录"""
+        query = """
+        INSERT INTO Visitor (
+            visitor_id, visitor_name, id_number, contact_number, 
+            entry_time, exit_time, entry_method
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        初始化 VisitorDAO
-        :param connection: 已建立的 MySQL 连接对象
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, (
+                    visitor.visitor_id, visitor.visitor_name, visitor.id_number,
+                    visitor.contact_number, visitor.entry_time, visitor.exit_time,
+                    visitor.entry_method
+                ))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Error creating visitor: {e}")
+            return False
+
+    @staticmethod
+    def get_by_id(visitor_id: str) -> Optional[Visitor]:
+        """根据ID获取游客信息"""
+        query = "SELECT * FROM Visitor WHERE visitor_id = %s"
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute(query, (visitor_id,))
+                row = cursor.fetchone()
+                if row:
+                    return Visitor(
+                        visitor_id=row['visitor_id'],
+                        visitor_name=row['visitor_name'],
+                        id_number=row['id_number'],
+                        contact_number=row['contact_number'],
+                        entry_time=row['entry_time'],
+                        exit_time=row['exit_time'],
+                        entry_method=row['entry_method']
+                    )
+                return None
+        except Exception as e:
+            print(f"Error fetching visitor by ID: {e}")
+            return None
+
+    @staticmethod
+    def update(visitor: Visitor) -> bool:
+        """更新游客信息"""
+        query = """
+        UPDATE Visitor SET 
+            visitor_name = %s, id_number = %s, contact_number = %s,
+            entry_time = %s, exit_time = %s, entry_method = %s
+        WHERE visitor_id = %s
         """
-        self.conn = connection
-
-    def create(self, name: str, phone: str, entry_time: str, exit_time: Optional[str] = None) -> int:
-        """插入新游客记录，返回 visitor_id"""
-        cursor = self.conn.cursor()
         try:
-            query = """
-                INSERT INTO Visitor (name, phone, entry_time, exit_time)
-                VALUES (%s, %s, %s, %s)
-            """
-            cursor.execute(query, (name, phone, entry_time, exit_time))
-            self.conn.commit()
-            return cursor.lastrowid
-        except mysql.connector.Error as e:
-            self.conn.rollback()
-            raise RuntimeError(f"Failed to create visitor: {e}")
-        finally:
-            cursor.close()
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, (
+                    visitor.visitor_name, visitor.id_number, visitor.contact_number,
+                    visitor.entry_time, visitor.exit_time, visitor.entry_method,
+                    visitor.visitor_id
+                ))
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating visitor: {e}")
+            return False
 
-    def get_by_id(self, visitor_id: int) -> Optional[Dict[str, Any]]:
-        """根据 ID 查询游客信息"""
-        cursor = self.conn.cursor(dictionary=True)
+    @staticmethod
+    def delete(visitor_id: str) -> bool:
+        """删除游客记录"""
+        query = "DELETE FROM Visitor WHERE visitor_id = %s"
         try:
-            query = "SELECT * FROM Visitor WHERE visitor_id = %s"
-            cursor.execute(query, (visitor_id,))
-            return cursor.fetchone()
-        finally:
-            cursor.close()
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, (visitor_id,))
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error deleting visitor: {e}")
+            return False
 
-    def update_exit_time(self, visitor_id: int, exit_time: str) -> bool:
-        """更新游客离开时间"""
-        cursor = self.conn.cursor()
+    @staticmethod
+    def get_all() -> List[Visitor]:
+        """获取所有游客记录"""
+        query = "SELECT * FROM Visitor"
+        visitors = []
         try:
-            query = "UPDATE Visitor SET exit_time = %s WHERE visitor_id = %s"
-            cursor.execute(query, (exit_time, visitor_id))
-            self.conn.commit()
-            return cursor.rowcount > 0
-        except mysql.connector.Error as e:
-            self.conn.rollback()
-            raise RuntimeError(f"Failed to update exit time: {e}")
-        finally:
-            cursor.close()
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                for row in rows:
+                    visitors.append(Visitor(
+                        visitor_id=row['visitor_id'],
+                        visitor_name=row['visitor_name'],
+                        id_number=row['id_number'],
+                        contact_number=row['contact_number'],
+                        entry_time=row['entry_time'],
+                        exit_time=row['exit_time'],
+                        entry_method=row['entry_method']
+                    ))
+        except Exception as e:
+            print(f"Error fetching all visitors: {e}")
+        return visitors
 
-    def delete(self, visitor_id: int) -> bool:
-        """软删除或硬删除游客记录（此处为硬删）"""
-        cursor = self.conn.cursor()
+    @staticmethod
+    def get_by_entry_method(entry_method: str) -> List[Visitor]:
+        """根据入场方式获取游客列表"""
+        query = "SELECT * FROM Visitor WHERE entry_method = %s"
+        visitors = []
         try:
-            query = "DELETE FROM Visitor WHERE visitor_id = %s"
-            cursor.execute(query, (visitor_id,))
-            self.conn.commit()
-            return cursor.rowcount > 0
-        except mysql.connector.Error as e:
-            self.conn.rollback()
-            raise RuntimeError(f"Failed to delete visitor: {e}")
-        finally:
-            cursor.close()
-
-    def list_all(self) -> List[Dict[str, Any]]:
-        """列出所有游客"""
-        cursor = self.conn.cursor(dictionary=True)
-        try:
-            cursor.execute("SELECT * FROM Visitor")
-            return cursor.fetchall()
-        finally:
-            cursor.close()
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute(query, (entry_method,))
+                rows = cursor.fetchall()
+                for row in rows:
+                    visitors.append(Visitor(
+                        visitor_id=row['visitor_id'],
+                        visitor_name=row['visitor_name'],
+                        id_number=row['id_number'],
+                        contact_number=row['contact_number'],
+                        entry_time=row['entry_time'],
+                        exit_time=row['exit_time'],
+                        entry_method=row['entry_method']
+                    ))
+        except Exception as e:
+            print(f"Error fetching visitors by entry method: {e}")
+        return visitors
