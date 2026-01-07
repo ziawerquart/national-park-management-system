@@ -1,12 +1,12 @@
 # 科研支撑模块索引说明
 
-## idx_project_status_time
+## idx_project_status_date
 
-**适用范围：** 按项目状态筛选并按时间排序的查询。
+**适用范围：** 按项目状态筛选并按审批日期排序的查询。
 
 **典型查询：**
 ```sql
-SELECT * FROM ResearchProject WHERE project_status = 'InProgress' ORDER BY start_time;
+SELECT * FROM ResearchProject WHERE project_status = 'ongoing' ORDER BY approval_date;
 ```
 
 ---
@@ -17,49 +17,49 @@ SELECT * FROM ResearchProject WHERE project_status = 'InProgress' ORDER BY start
 
 **典型查询：**
 ```sql
-SELECT * FROM ResearchProject WHERE leader_user_id = 'U001';
+SELECT * FROM ResearchProject WHERE leader_id = 'U001';
 ```
 
 ---
 
-## idx_collection_time_project
+## idx_record_project_time
 
-**适用范围：** 按时间范围查询某项目的采集记录。
+**适用范围：** 按时间范围查询某项目的数据记录。
 
 **典型查询：**
 ```sql
-SELECT * FROM ResearchDataCollection WHERE project_id = 'P001' AND collection_time BETWEEN '2024-01-01' AND '2024-12-31';
+SELECT * FROM ResearchDataRecord WHERE project_id = 'P001' AND collection_time BETWEEN '2024-01-01' AND '2024-12-31';
 ```
 
 ---
 
-## idx_result_type_access
+## idx_record_collector
 
-**适用范围：** 按成果类型和访问级别筛选成果。
+**适用范围：** 查询某采集员的所有数据记录。
 
 **典型查询：**
 ```sql
-SELECT * FROM ResearchResult WHERE result_type = 'Paper' AND access_level = 'Public';
+SELECT * FROM ResearchDataRecord WHERE collector_id = 'U002';
 ```
 
 ---
 
-## idx_monitor_habitat_species
+## idx_record_region
 
-**适用范围：** 查询特定栖息地中特定物种的监测记录。
+**适用范围：** 按区域筛选数据记录。
 
 **典型查询：**
 ```sql
-SELECT * FROM MonitoringRecord WHERE habitat_id = 'H001' AND species_id = 'S001' ORDER BY monitor_time DESC;
+SELECT * FROM ResearchDataRecord WHERE region_id = 'R001';
 ```
 
 ---
 
-## idx_species_protection
+## idx_achievement_type_permission
 
-**适用范围：** 按保护级别筛选物种。
+**适用范围：** 按成果类型和共享权限筛选成果。
 
 **典型查询：**
 ```sql
-SELECT * FROM Species WHERE protection_level = 'Endangered';
+SELECT * FROM ResearchAchievement WHERE achievement_type = 'paper' AND share_permission = 'public';
 ```
