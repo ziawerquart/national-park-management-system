@@ -47,24 +47,31 @@
 - **测试框架**: pytest
 
 ## 📂 文件夹结构
-NATIONAL-PARK-MANAGEMENT-SYSTEM
-├─docs#所有设计文档
-│  ├─design#数据库设计文档
-│  │  ├─data_dictionary#数据字典
-│  │  └─er_diagrams#E-R图
-│  ├─meeting_records#会议记录
-│  └─requirements#需求分析文档
-├─sql#所有sql代码
-│  ├─ddl#DDL语句
-│  ├─queries#业务查询SQL
-│  ├─stored_procedures#存储过程
-│  ├─triggers#触发器
-│  └─views#视图
-├─src#源代码
-│  ├─main#主要代码
-│  └─test#测试代码
-└─team#团队管理
-└── README.md # 本文件
+```commandline
+national-park-management-system/
+├─docs                 设计与分析类文档（用例图/鲁棒图/UML/数据字典/安全等）— 阶段：第一阶段、第四阶段
+│  ├─UML               UML 类图与说明文档 — 阶段：第一阶段
+│  ├─use_case_diagram  用例图与说明 — 阶段：第一阶段
+│  ├─robustness_diagram 鲁棒图与说明 — 阶段：第一阶段
+│  ├─data_dictionary   数据字典与命名/字段校验记录 — 阶段：第一阶段
+│  └─security          安全设计相关文档 — 阶段：第四阶段
+├─sql                  数据库脚本集合（结构/数据/查询/索引/视图/过程/触发器）— 阶段：第二阶段、第三阶段、第四阶段
+│  ├─DDL               逻辑/物理结构设计与约束说明 — 阶段：第二阶段
+│  ├─DML               测试/种子数据脚本 — 阶段：第三阶段
+│  ├─QUERY             复杂查询与性能/优化记录 — 阶段：第三阶段
+│  ├─INDEX             索引设计与说明 — 阶段：第四阶段
+│  ├─VIEW              视图设计与说明 — 阶段：第四阶段
+│  ├─PROC              存储过程设计与说明 — 阶段：第四阶段
+│  └─TRIGGER           触发器设计与说明 — 阶段：第四阶段
+├─src                  Python 持久层与测试代码 — 阶段：第三阶段
+│  ├─dao               DAO 实现与测试报告/截图 — 阶段：第三阶段
+│  └─test              DAO 单元测试用例 — 阶段：第三阶段
+├─presentation         答辩与报告材料 — 阶段：第五阶段
+│  ├─ppt               答辩 PPT — 阶段：第五阶段
+│  └─report            小组/个人报告 — 阶段：第五阶段
+└─team                 团队管理与会议/进度资料 — 阶段：第一至第五阶段
+   └─meeting_records   会议纪要 — 阶段：第一阶段、第四阶段、第五阶段
+```
 
 
 ## 👥 团队分工
